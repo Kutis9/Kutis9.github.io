@@ -29,6 +29,9 @@ npm run lint         # ESLint with TypeScript-ESLint rules
 npm run preview      # Preview production build locally
 ```
 
+### Terminal Usage Protocol
+**Always go to the terminal with shortcut `Ctrl+`** when executing commands. Use cmd-compatible commands and avoid PowerShell-specific syntax.
+
 ### Build Process
 - **Two-stage build**: `tsc -b && vite build` (TypeScript check first, then Vite bundling)
 - Build artifacts go to `dist/` directory for GitHub Pages deployment

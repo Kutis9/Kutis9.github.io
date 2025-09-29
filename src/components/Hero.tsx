@@ -1,10 +1,43 @@
-import { motion } from 'motion/react';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { Download, Github, Linkedin, Mail } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '../config';
 import profilePhoto from '../assets/main-photo-cartoon.png';
 
 export function Hero() {
+  // Smooth mouse tracking system inspired by motion-primitives
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  // High-performance spring animations with optimal config
+  const springConfig = { bounce: 0, damping: 25, stiffness: 150 };
+  const springX = useSpring(mouseX, springConfig);
+  const springY = useSpring(mouseY, springConfig);
+  
+  // Transform values with natural movement limits
+  const rotateX = useTransform(springY, [-0.5, 0.5], [15, -15]);
+  const rotateY = useTransform(springX, [-0.5, 0.5], [-15, 15]);
+  const scale = useTransform(springX, [-0.5, 0, 0.5], [0.98, 1.02, 0.98]);
+
+  // Smooth mouse move handler
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Normalize to -0.5 to 0.5 range for smooth spring animation
+    const xPos = (e.clientX - centerX) / rect.width;
+    const yPos = (e.clientY - centerY) / rect.height;
+    
+    mouseX.set(xPos);
+    mouseY.set(yPos);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50/20 to-purple-50/5 pt-14 sm:pt-16">
       {/* Floating background elements */}
@@ -126,156 +159,116 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* 3D Profile Character - Dramatic Entry */}
+          {/* Pure 3D Photo - Ultra Original Effect */}
           <motion.div
-            initial={{ 
-              opacity: 0, 
-              scale: 0.3, 
-              rotateY: -90, 
-              rotateX: 45,
-              z: -200 
-            }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              rotateY: 0, 
-              rotateX: 0,
-              z: 0 
-            }}
-            transition={{ 
-              duration: 1.5, 
-              delay: 0.8,
-              type: "spring",
-              stiffness: 100,
-              damping: 20
-            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
             className="relative flex items-center justify-center"
-            style={{ 
-              perspective: "1200px",
-              transformStyle: "preserve-3d"
-            }}
           >
-            {/* Dramatic background explosion effect */}
-            <motion.div
-              className="absolute w-96 h-96 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-3xl"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ 
-                scale: [0, 1.5, 1],
-                opacity: [0, 0.8, 0.3],
-                rotate: [0, 180, 360]
-              }}
-              transition={{
-                duration: 2,
-                delay: 1.2,
-                ease: "easeOut"
-              }}
-            />
-            
-            {/* Main 3D Character - Pop Out Effect */}
-            <motion.div
-              className="relative"
-              initial={{ 
-                rotateY: -45,
-                rotateX: 20,
-                scale: 0.8,
-                z: -100
-              }}
-              animate={{ 
-                rotateY: 0,
-                rotateX: 0,
-                scale: 1,
-                z: 50
-              }}
-              transition={{ 
-                duration: 1.2, 
-                delay: 1.0,
-                type: "spring",
-                stiffness: 200,
-                damping: 15
-              }}
-              whileHover={{ 
-                scale: 1.08,
-                rotateY: 15,
-                rotateX: -10,
-                z: 80,
-                transition: { type: "spring", stiffness: 400, damping: 25 }
-              }}
-              style={{ 
-                transformStyle: "preserve-3d",
-                perspective: "1000px"
-              }}
-            >
-              {/* Dynamic shadow that grows during entry */}
-              <motion.div 
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-64 h-12 bg-black/30 rounded-full blur-2xl"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 0.4 }}
-                transition={{ duration: 1, delay: 1.3 }}
-                whileHover={{ scale: 1.2, opacity: 0.6 }}
-                style={{ transform: "translateZ(-80px)" }}
+            {/* Technology Rainbow Arcs Behind Photo */}
+            <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden" style={{ zIndex: -10, paddingBottom: '100px' }}>
+              {/* Large Arc */}
+              <motion.div
+                className="absolute border-2 border-blue-200/40 rounded-full"
+                style={{
+                  width: '650px',
+                  height: '650px',
+                  zIndex: -10,
+                  bottom: '-325px'
+                }}
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 60,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
               />
               
-              {/* Main character image with pop-out effect */}
+              {/* Medium Arc */}
+              <motion.div
+                className="absolute border-2 border-purple-200/35 rounded-full"
+                style={{
+                  width: '520px',
+                  height: '520px',
+                  zIndex: -11,
+                  bottom: '-260px'
+                }}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 45,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+              
+              {/* Small Arc */}
+              <motion.div
+                className="absolute border-2 border-green-200/30 rounded-full"
+                style={{
+                  width: '390px',
+                  height: '390px',
+                  zIndex: -12,
+                  bottom: '-195px'
+                }}
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 30,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+            </div>
+
+            {/* Simple 3D Photo Effect */}
+            <motion.div
+              className="relative"
+              whileHover={{ scale: 1.02 }}
+              style={{ 
+                transformStyle: "preserve-3d",
+                perspective: "1000px",
+                zIndex: 100
+              }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+
+              {/* Main Photo with Smooth 3D Transform */}
               <motion.img 
                 src={profilePhoto}
                 alt={personalInfo.name}
-                className="w-80 h-auto object-contain relative z-20"
-                initial={{ 
-                  scale: 0.5,
-                  rotateY: 30,
-                  z: -50
+                className="w-96 h-auto object-contain relative cursor-pointer"
+                initial={{
+                  y: "100vh",
+                  opacity: 0.3
                 }}
                 animate={{
-                  scale: 1,
-                  rotateY: 0,
-                  z: 30,
-                  y: [0, -8, 0],
+                  y: 0,
+                  opacity: 1
                 }}
                 transition={{
-                  scale: { duration: 1, delay: 1.1, type: "spring", stiffness: 300 },
-                  rotateY: { duration: 1, delay: 1.1 },
-                  z: { duration: 1, delay: 1.1 },
-                  y: {
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 2
-                  }
-                }}
-                whileHover={{ 
-                  y: -15,
-                  rotateZ: 3,
-                  rotateY: 8,
-                  scale: 1.05,
-                  z: 50,
-                  transition: { 
-                    type: "spring", 
-                    stiffness: 500, 
-                    damping: 25 
-                  }
+                  type: "spring",
+                  stiffness: 80,
+                  damping: 25,
+                  delay: 0.3,
+                  duration: 1.5
                 }}
                 style={{ 
-                  filter: "drop-shadow(0 25px 50px rgba(0,0,0,0.3))",
-                  transform: "translateZ(50px)"
+                  filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.25))",
+                  transformStyle: "preserve-3d",
+                  rotateX,
+                  rotateY,
+                  scale,
+                  zIndex: 100,
+                  position: 'relative'
                 }}
-              />
-              
-              {/* Glowing rim light effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-2xl"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{
-                  opacity: [0, 0.4, 0.2],
-                  scale: [0, 1.2, 1],
+                whileHover={{
+                  transition: {
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }
                 }}
-                transition={{
-                  duration: 2,
-                  delay: 1.5,
-                  repeat: Infinity,
-                  repeatDelay: 3,
-                  ease: "easeInOut",
-                }}
-                style={{ transform: "translateZ(-20px)" }}
               />
             </motion.div>
           </motion.div>

@@ -58,9 +58,14 @@ export function Navigation() {
                   {personalInfo.name.split(' ').map(n => n[0]).join('')}
                 </span>
               </div>
-              <span className="text-lg sm:text-xl bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
-                {personalInfo.name}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-lg sm:text-xl bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                  {personalInfo.name}
+                </span>
+                <span className="text-xs sm:text-sm text-gray-500">
+                  Based in {personalInfo.location}
+                </span>
+              </div>
             </div>
           </motion.div>
 

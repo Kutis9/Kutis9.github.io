@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Download, Github, Linkedin, Mail } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '../config';
+import profilePhoto from '../assets/main-photo-cartoon.png';
 
 export function Hero() {
   return (
@@ -125,51 +126,157 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* 3D Profile Card */}
+          {/* 3D Profile Character - Dramatic Entry */}
           <motion.div
-            initial={{ opacity: 0, y: 50, rotateY: -30 }}
-            animate={{ opacity: 1, y: 0, rotateY: 0 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="relative"
+            initial={{ 
+              opacity: 0, 
+              scale: 0.3, 
+              rotateY: -90, 
+              rotateX: 45,
+              z: -200 
+            }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              rotateY: 0, 
+              rotateX: 0,
+              z: 0 
+            }}
+            transition={{ 
+              duration: 1.5, 
+              delay: 0.8,
+              type: "spring",
+              stiffness: 100,
+              damping: 20
+            }}
+            className="relative flex items-center justify-center"
+            style={{ 
+              perspective: "1200px",
+              transformStyle: "preserve-3d"
+            }}
           >
+            {/* Dramatic background explosion effect */}
             <motion.div
-              className="relative w-full max-w-md mx-auto"
-              whileHover={{ 
-                rotateY: 10,
-                rotateX: -5,
+              className="absolute w-96 h-96 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-3xl"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ 
+                scale: [0, 1.5, 1],
+                opacity: [0, 0.8, 0.3],
+                rotate: [0, 180, 360]
+              }}
+              transition={{
+                duration: 2,
+                delay: 1.2,
+                ease: "easeOut"
+              }}
+            />
+            
+            {/* Main 3D Character - Pop Out Effect */}
+            <motion.div
+              className="relative"
+              initial={{ 
+                rotateY: -45,
+                rotateX: 20,
+                scale: 0.8,
+                z: -100
+              }}
+              animate={{ 
+                rotateY: 0,
+                rotateX: 0,
+                scale: 1,
                 z: 50
               }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{ transformStyle: "preserve-3d" }}
+              transition={{ 
+                duration: 1.2, 
+                delay: 1.0,
+                type: "spring",
+                stiffness: 200,
+                damping: 15
+              }}
+              whileHover={{ 
+                scale: 1.08,
+                rotateY: 15,
+                rotateX: -10,
+                z: 80,
+                transition: { type: "spring", stiffness: 400, damping: 25 }
+              }}
+              style={{ 
+                transformStyle: "preserve-3d",
+                perspective: "1000px"
+              }}
             >
-              <div className="bg-gradient-to-br from-white via-gray-50/50 to-gray-100 border rounded-3xl p-8 shadow-2xl backdrop-blur-sm relative overflow-hidden">
-                {/* Gloss effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-3xl" />
-                
-                {/* Profile Image */}
-                <div className="relative z-10 space-y-6">
-                  <div className="w-48 h-48 mx-auto relative">
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-1">
-                      <div className="w-full h-full bg-gradient-to-br from-gray-100/50 to-white rounded-full flex items-center justify-center">
-                        <div className="w-40 h-40 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full flex items-center justify-center text-6xl">
-                          👨‍💻
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-center space-y-2">
-                    <h3 className="text-xl text-gray-900">Creative Developer</h3>
-                    <p className="text-gray-600">Based in {personalInfo.location}</p>
-                    <div className="flex justify-center gap-2 pt-4">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-sm text-gray-600">
-                        {personalInfo.availableForWork ? 'Available for work' : 'Currently unavailable'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Dynamic shadow that grows during entry */}
+              <motion.div 
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-64 h-12 bg-black/30 rounded-full blur-2xl"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.4 }}
+                transition={{ duration: 1, delay: 1.3 }}
+                whileHover={{ scale: 1.2, opacity: 0.6 }}
+                style={{ transform: "translateZ(-80px)" }}
+              />
+              
+              {/* Main character image with pop-out effect */}
+              <motion.img 
+                src={profilePhoto}
+                alt={personalInfo.name}
+                className="w-80 h-auto object-contain relative z-20"
+                initial={{ 
+                  scale: 0.5,
+                  rotateY: 30,
+                  z: -50
+                }}
+                animate={{
+                  scale: 1,
+                  rotateY: 0,
+                  z: 30,
+                  y: [0, -8, 0],
+                }}
+                transition={{
+                  scale: { duration: 1, delay: 1.1, type: "spring", stiffness: 300 },
+                  rotateY: { duration: 1, delay: 1.1 },
+                  z: { duration: 1, delay: 1.1 },
+                  y: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 2
+                  }
+                }}
+                whileHover={{ 
+                  y: -15,
+                  rotateZ: 3,
+                  rotateY: 8,
+                  scale: 1.05,
+                  z: 50,
+                  transition: { 
+                    type: "spring", 
+                    stiffness: 500, 
+                    damping: 25 
+                  }
+                }}
+                style={{ 
+                  filter: "drop-shadow(0 25px 50px rgba(0,0,0,0.3))",
+                  transform: "translateZ(50px)"
+                }}
+              />
+              
+              {/* Glowing rim light effect */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-2xl"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{
+                  opacity: [0, 0.4, 0.2],
+                  scale: [0, 1.2, 1],
+                }}
+                transition={{
+                  duration: 2,
+                  delay: 1.5,
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  ease: "easeInOut",
+                }}
+                style={{ transform: "translateZ(-20px)" }}
+              />
             </motion.div>
           </motion.div>
         </div>

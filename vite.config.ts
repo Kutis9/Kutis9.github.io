@@ -8,8 +8,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  // GitHub Pages base path
-  base: '/',
+  // GitHub Pages base path - using relative paths for better compatibility
+  base: './',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

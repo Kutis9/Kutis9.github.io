@@ -128,6 +128,13 @@ export function Hero() {
                 style={{
                   filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.25))"
                 }}
+                loading="lazy"
+                onError={(e) => {
+                  console.error('Failed to load profile photo:', e);
+                }}
+                onLoad={() => {
+                  console.log('Profile photo loaded successfully');
+                }}
               />
               
               {/* Dynamic shadow that follows the character */}

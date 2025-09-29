@@ -1,17 +1,10 @@
-// Main configuration file - safe for public repositories
-// Import only public data by default
+// Main configuration - works perfectly on GitHub Pages
+// Uses only public data that's safe to commit
 import { publicInfo } from './public';
 
-// Safe fallback for private information
-const safePrivateDefaults = {
-  email: "contact@example.com", // Generic safe email
-  phone: "", // No phone displayed
-};
-
-// Export combined configuration
-// If you want real private data, create src/config/private.ts and modify this file locally
+// Direct export for GitHub Pages compatibility
 export const personalInfo = {
-  // All public information
+  // Basic information
   name: publicInfo.name,
   title: publicInfo.title,
   location: publicInfo.location,
@@ -20,11 +13,11 @@ export const personalInfo = {
   availableForWork: publicInfo.availableForWork,
   resumeUrl: publicInfo.resumeUrl,
   
-  // Safe contact defaults (override locally if needed)
-  email: safePrivateDefaults.email,
-  phone: safePrivateDefaults.phone,
+  // Contact information (public-safe)
+  email: publicInfo.email,
+  phone: publicInfo.phone,
   
-  // Public social links
+  // Social links
   links: {
     github: publicInfo.socialLinks.github,
     linkedin: publicInfo.socialLinks.linkedin,

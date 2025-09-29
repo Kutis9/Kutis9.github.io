@@ -1,5 +1,5 @@
 // PUBLIC configuration - safe to commit to GitHub
-// Only display information that you want to be publicly visible
+// All information here will be visible on your public website
 
 export const publicInfo = {
   // Basic public information
@@ -11,10 +11,14 @@ export const publicInfo = {
   tagline: "I craft digital experiences that blend beautiful design with powerful functionality.",
   description: "Passionate about creating innovative solutions that make a difference.",
   
+  // PUBLIC contact info (use what you're comfortable sharing publicly)
+  email: "contact@kutis9.dev", // Professional contact email
+  phone: "", // Leave empty if you don't want to share publicly
+  
   // Public social links - these are meant to be shared anyway
   socialLinks: {
     github: "https://github.com/Kutis9",
-    linkedin: "https://linkedin.com/in/your-profile",
+    linkedin: "https://linkedin.com/in/your-profile", // Update with your actual profile
     portfolio: "https://kutis9.github.io"
   },
   

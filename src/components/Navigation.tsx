@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { personalInfo } from '../config';
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -53,10 +54,12 @@ export function Navigation() {
           >
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm sm:text-lg">JD</span>
+                <span className="text-white font-bold text-sm sm:text-lg">
+                  {personalInfo.name.split(' ').map(n => n[0]).join('')}
+                </span>
               </div>
               <span className="text-lg sm:text-xl bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
-                John Doe
+                {personalInfo.name}
               </span>
             </div>
           </motion.div>

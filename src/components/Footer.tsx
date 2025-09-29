@@ -1,4 +1,5 @@
 import { Github, Linkedin, Mail, Heart } from 'lucide-react';
+import { personalInfo } from '../config';
 
 export function Footer() {
   return (
@@ -7,28 +8,34 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">JD</span>
+              <span className="text-white font-bold text-sm">
+                {personalInfo.name.split(' ').map(n => n[0]).join('')}
+              </span>
             </div>
-            <span className="text-lg font-semibold">John Doe</span>
+            <span className="text-lg font-semibold">{personalInfo.name}</span>
           </div>
           
           <div className="flex items-center space-x-6">
             <a
-              href="#"
+              href={personalInfo.links.github}
               className="text-gray-400 hover:text-white transition-colors duration-200"
               aria-label="GitHub"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <Github className="w-6 h-6" />
             </a>
             <a
-              href="#"
+              href={personalInfo.links.linkedin}
               className="text-gray-400 hover:text-white transition-colors duration-200"
               aria-label="LinkedIn"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <Linkedin className="w-6 h-6" />
             </a>
             <a
-              href="mailto:john.doe@example.com"
+              href={`mailto:${personalInfo.email}`}
               className="text-gray-400 hover:text-white transition-colors duration-200"
               aria-label="Email"
             >
@@ -41,7 +48,7 @@ export function Footer() {
           <p className="text-gray-400 flex items-center justify-center space-x-2">
             <span>Made with</span>
             <Heart className="w-4 h-4 text-red-500" />
-            <span>by John Doe</span>
+            <span>by {personalInfo.name}</span>
           </p>
           <p className="text-gray-500 text-sm mt-2">
             © {new Date().getFullYear()} All rights reserved.

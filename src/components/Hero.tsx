@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Download, Github, Linkedin, Mail } from 'lucide-react';
 import { Button } from './ui/button';
+import { personalInfo } from '../config';
 
 export function Hero() {
   return (
@@ -57,7 +58,7 @@ export function Hero() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-purple-600 bg-clip-text text-transparent"
               >
-                John Doe
+                {personalInfo.name}
               </motion.h1>
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -65,7 +66,7 @@ export function Hero() {
                 transition={{ delay: 0.6, duration: 0.6 }}
                 className="text-2xl lg:text-3xl text-gray-600"
               >
-                Full Stack Developer
+                {personalInfo.title}
               </motion.h2>
             </div>
 
@@ -75,8 +76,7 @@ export function Hero() {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="text-lg text-gray-600 leading-relaxed max-w-lg"
             >
-              I craft digital experiences that blend beautiful design with powerful functionality. 
-              Passionate about creating innovative solutions that make a difference.
+              {personalInfo.tagline} {personalInfo.description}
             </motion.p>
 
             <motion.div
@@ -85,7 +85,11 @@ export function Hero() {
               transition={{ delay: 1, duration: 0.6 }}
               className="flex flex-wrap gap-4"
             >
-              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+              <Button 
+                size="lg" 
+                className="group relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                onClick={() => window.open(personalInfo.resumeUrl, '_blank')}
+              >
                 <span className="relative z-10 flex items-center gap-2">
                   <Download className="w-4 h-4" />
                   Download CV
@@ -93,13 +97,28 @@ export function Hero() {
               </Button>
               
               <div className="flex gap-3">
-                <Button variant="outline" size="lg" className="p-3 hover:scale-110 transition-transform duration-200">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="p-3 hover:scale-110 transition-transform duration-200"
+                  onClick={() => window.open(personalInfo.links.github, '_blank')}
+                >
                   <Github className="w-5 h-5" />
                 </Button>
-                <Button variant="outline" size="lg" className="p-3 hover:scale-110 transition-transform duration-200">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="p-3 hover:scale-110 transition-transform duration-200"
+                  onClick={() => window.open(personalInfo.links.linkedin, '_blank')}
+                >
                   <Linkedin className="w-5 h-5" />
                 </Button>
-                <Button variant="outline" size="lg" className="p-3 hover:scale-110 transition-transform duration-200">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="p-3 hover:scale-110 transition-transform duration-200"
+                  onClick={() => window.open(`mailto:${personalInfo.email}`, '_self')}
+                >
                   <Mail className="w-5 h-5" />
                 </Button>
               </div>
@@ -141,10 +160,12 @@ export function Hero() {
                   
                   <div className="text-center space-y-2">
                     <h3 className="text-xl text-gray-900">Creative Developer</h3>
-                    <p className="text-gray-600">Based in San Francisco</p>
+                    <p className="text-gray-600">Based in {personalInfo.location}</p>
                     <div className="flex justify-center gap-2 pt-4">
                       <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-sm text-gray-600">Available for work</span>
+                      <span className="text-sm text-gray-600">
+                        {personalInfo.availableForWork ? 'Available for work' : 'Currently unavailable'}
+                      </span>
                     </div>
                   </div>
                 </div>

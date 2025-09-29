@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Private configuration files - NEVER commit sensitive data!
+src/config/private.ts
+*.env
+*.env.local
+*.env.production
+.env
+
 # Editor directories and files
 portfolio-figma-design
 .vscode/*

@@ -43,7 +43,7 @@ src/
 
 Aplikácia sa automaticky deployuje na GitHub Pages pri push na `main` branch.
 
-**Live URL**: [https://Kutis9.github.io/portfolio-app/](https://Kutis9.github.io/portfolio-app/)
+**Live URL**: [https://Kutis9.github.io/](https://Kutis9.github.io/)
 
 Viac informácií v [`DEPLOYMENT.md`](./DEPLOYMENT.md)
 

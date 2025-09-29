@@ -5,9 +5,9 @@
 Projekt je nakonfigurovaný pre automatický deployment na GitHub Pages pomocou GitHub Actions.
 
 ### Konfigurácia:
-- **Base URL**: `/portfolio-app/` (nakonfigurované v `vite.config.ts`)
+- **Base URL**: `/` (root domain)
 - **Build Output**: `dist/` priečinok
-- **Homepage**: `https://Kutis9.github.io/portfolio-app/`
+- **Homepage**: `https://Kutis9.github.io/`
 
 ### GitHub Actions Workflow:
 1. **Build Job**: Inštalácia dependencií, TypeScript kompilácia, Vite build
@@ -30,4 +30,4 @@ npm run preview  # Preview produkčnej verzie lokálne
 3. Workflow sa automaticky spustí po push na main branch
 
 ## URL aplikácie po deployment:
-`https://Kutis9.github.io/portfolio-app/`
+`https://Kutis9.github.io/`

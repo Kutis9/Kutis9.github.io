@@ -1,10 +1,11 @@
 import { motion } from 'motion/react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { Button } from './ui/button';
+import personalInfo from '../config';
 
 export function Contact() {
   return (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-20">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -46,7 +47,7 @@ export function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Location</h3>
-                    <p className="text-gray-600">San Francisco, CA</p>
+                    <p className="text-gray-600">{personalInfo.location}</p>
                   </div>
                 </div>
               </div>

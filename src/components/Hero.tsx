@@ -24,7 +24,7 @@ export function Hero() {
               Hello, I'm
             </motion.p>
             <motion.h1 
-            
+
               className="text-5xl lg:text-6xl font-bold"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export function Hero() {
             transition={{ delay: 1, duration: 0.6 }}
           >
             <Button 
-              className="bg-blue-600 hover:bg-blue-700 gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
               onClick={() => window.open(personalInfo.resumeUrl, '_blank')}
             >
               <Download size={18} />
@@ -146,7 +146,7 @@ export function Hero() {
         
         {/* Floating Code Snippets */}
         <motion.div 
-          className="floating-code-snippet absolute top-56 right-8 z-10"
+          className="floating-code-snippet absolute top-56 right-1/2 z-10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.8 }}

@@ -27,12 +27,6 @@ export function Contact() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Debug info for production troubleshooting
-    console.log('EmailJS Config Debug:');
-    console.log('Service ID:', emailConfig.serviceId);
-    console.log('Template ID:', emailConfig.templateId);
-    console.log('Public Key:', emailConfig.publicKey);
-    console.log('Is development:', import.meta.env.DEV);
 
     // Validation check
     if (emailConfig.serviceId === 'service_YOUR_ID' || 

@@ -27,6 +27,23 @@ export function Contact() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
+    // Debug info for production troubleshooting
+    console.log('EmailJS Config Debug:');
+    console.log('Service ID:', emailConfig.serviceId);
+    console.log('Template ID:', emailConfig.templateId);
+    console.log('Public Key:', emailConfig.publicKey);
+    console.log('Is development:', import.meta.env.DEV);
+
+    // Validation check
+    if (emailConfig.serviceId === 'service_YOUR_ID' || 
+        emailConfig.templateId === 'template_YOUR_ID' || 
+        emailConfig.publicKey === 'YOUR_PUBLIC_KEY') {
+      console.error('❌ EmailJS not configured! Using default placeholder values.');
+      setSubmitStatus('error');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       // EmailJS configuration
       await emailjs.send(

@@ -8,8 +8,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  // GitHub Pages base path - using relative paths for better compatibility
-  base: './',
+  // GitHub Pages base path - for user pages (kutis9.github.io) use root
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

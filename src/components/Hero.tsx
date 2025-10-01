@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { Download, Github, Linkedin, Mail } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '../config';
-import profilePhoto from '../assets/main-photo-cartoon.png';
+import profilePhoto from '../assets/kutis_01_final_transparent.png';
 
 export function Hero() {
   return (

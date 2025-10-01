@@ -1,10 +1,11 @@
 import { motion } from 'motion/react';
-import { Mail, MapPin, Phone, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, MapPin, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { Button } from './ui/button';
 import personalInfo from '../config';
 import { emailConfig } from '../config/emailConfig';
+import contactImage from '../assets/kutis_02_Contact_transparent.png';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -81,14 +82,14 @@ export function Contact() {
             Get In Touch
           </h2>
           
-          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
-            <div className="space-y-8">
+          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-end">
+            <div className="space-y-8 flex flex-col justify-between h-full">
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <Mail className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div>
+                  <div className="flex flex-col items-start">
                     <h3 className="font-semibold text-gray-900">Email</h3>
                     <p className="text-gray-600">{personalInfo.email}</p>
                   </div>
@@ -96,24 +97,33 @@ export function Contact() {
                 
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Phone className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Phone</h3>
-                    <p className="text-gray-600">{personalInfo.phone || '+421 XXX XXX XXX'}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <MapPin className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div>
+                  <div className="flex flex-col items-start">
                     <h3 className="font-semibold text-gray-900">Location</h3>
                     <p className="text-gray-600">{personalInfo.location}</p>
                   </div>
                 </div>
               </div>
+
+              {/* Contact Image - aligned to bottom */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="flex justify-center self-end"
+              >
+                <div className="relative">
+                  <img
+                    src={contactImage}
+                    alt="Lukáš Kuťka - Contact"
+                    className="w-72 h-auto object-contain object-bottom"
+                  />
+                  {/* Fade overlay at the bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/65 to-transparent pointer-events-none"></div>
+                </div>
+              </motion.div>
             </div>
             
             <div className="bg-gray-50 rounded-xl p-8">

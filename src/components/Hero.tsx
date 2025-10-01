@@ -3,8 +3,105 @@ import { Download, Github, Linkedin, Mail } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '../config';
 import profilePhoto from '../assets/kutis_01_final_transparent.png';
+import { useState, useEffect } from 'react';
 
 export function Hero() {
+  // Hook pre detekciu screen size
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Desktop code snippets (pôvodné pozície)
+  const DesktopCodeSnippets = () => (
+    <>
+      <motion.div 
+        className="floating-code-snippet absolute top-56 right-1/2 z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-3 py-2 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
+          <span className="text-blue-400">git</span> <span className="text-green-300">commit</span> <span className="text-yellow-300">-m</span>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="floating-code-snippet absolute bottom-24 left-1/2 z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 0.8 }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-3 py-2 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
+          <span className="text-red-400">function</span> <span className="text-cyan-400">App</span>() {`{}`}
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="floating-code-snippet absolute top-20 left-1/2 z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.8, duration: 0.8 }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-3 py-2 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
+          <span className="text-purple-400">import</span> React <span className="text-blue-400">from</span> <span className="text-yellow-300">'react'</span>
+        </div>
+      </motion.div>
+    </>
+  );
+
+  // Mobile code snippets (okolo postavy) - upravíš pozície podľa potreby
+  const MobileCodeSnippets = () => (
+    <>
+      <motion.div 
+        className="floating-code-snippet absolute top-120 right-4 z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-2 py-1 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
+          <span className="text-blue-400">git</span> <span className="text-green-300">commit</span>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="floating-code-snippet absolute bottom-20 left-4 z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 0.8 }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-2 py-1 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
+          <span className="text-red-400">function</span> <span className="text-cyan-400">App</span>()
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="floating-code-snippet absolute top-120 right-80 z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.8, duration: 0.8 }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-2 py-1 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
+          <span className="text-purple-400">import</span> React
+        </div>
+      </motion.div>
+    </>
+  );
+
   return (
     <section id="home" className="relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center relative">
@@ -144,42 +241,8 @@ export function Hero() {
           </div>
         </motion.div>
         
-        {/* Floating Code Snippets */}
-        <motion.div 
-          className="floating-code-snippet absolute top-56 right-1/2 z-10"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-3 py-2 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
-            <span className="text-blue-400">git</span> <span className="text-green-300">commit</span> <span className="text-yellow-300">-m</span>
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="floating-code-snippet absolute bottom-24 left-1/2 z-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.8 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-3 py-2 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
-            <span className="text-red-400">function</span> <span className="text-cyan-400">App</span>() {`{}`}
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="floating-code-snippet absolute top-20 left-1/2 z-10"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8, duration: 0.8 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="bg-gray-900/95 backdrop-blur-sm text-green-400 px-3 py-2 rounded-lg shadow-xl border border-gray-700/50 font-mono text-xs">
-            <span className="text-purple-400">import</span> React <span className="text-blue-400">from</span> <span className="text-yellow-300">'react'</span>
-          </div>
-        </motion.div>
+        {/* Responsive Code Snippets */}
+        {isMobile ? <MobileCodeSnippets /> : <DesktopCodeSnippets />}
       </div>
       
       {/* Gradient overlay for depth */}

@@ -7,8 +7,7 @@ import { personalInfo } from '../config';
 const navItems = [
   { name: 'Home', href: '#home' },
   { name: 'About', href: '#about' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Contact', href: '#contact' }
+  { name: 'Projects', href: '#projects' }
 ];
 
 export function Navigation() {
@@ -38,11 +37,12 @@ export function Navigation() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200/50' 
-          : 'bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
+  bg-white shadow-lg border-b border-gray-200/50
+  ${scrolled 
+    ? 'md:bg-white/80 md:backdrop-blur-md' 
+    : 'md:bg-transparent md:backdrop-blur-none md:shadow-none md:border-none'
+  }`}
     >
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14 sm:h-16">
@@ -93,7 +93,7 @@ export function Navigation() {
               className="ml-4 group relative overflow-hidden"
               onClick={() => handleNavClick('#contact')}
             >
-              <span className="relative z-10">Hire Me</span>
+              <span className="relative z-10">Contact</span>
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Button>
           </div>
@@ -119,7 +119,7 @@ export function Navigation() {
           transition={{ duration: 0.3 }}
           className="md:hidden overflow-hidden"
         >
-          <div className="py-4 space-y-2 border-t border-gray-200/50 bg-white/95 backdrop-blur-md shadow-lg rounded-b-xl mx-4 -mb-4 relative">
+          <div className="py-4 space-y-2 shadow-lg rounded-b-xl mx-4 -mb-4 relative">
             <div className="relative z-10 space-y-2 px-2">
               {navItems.map((item, index) => (
                 <motion.button
@@ -136,13 +136,13 @@ export function Navigation() {
                   {item.name}
                 </motion.button>
               ))}
-              <div className="px-2 pt-2">
+              <div className="px-2 pt-2 pb-4">
                 <Button 
                   variant="outline" 
                   className="w-full group relative overflow-hidden"
                   onClick={() => handleNavClick('#contact')}
                 >
-                  <span className="relative z-10">Hire Me</span>
+                  <span className="relative z-10">Contact</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </Button>
               </div>

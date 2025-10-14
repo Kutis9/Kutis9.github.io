@@ -16,7 +16,7 @@ export function About() {
           </h2>
           <div className="max-w-3xl mx-auto space-y-6">
             <p className="text-lg text-gray-600 leading-relaxed">
-              I'm a passionate Full Stack Developer with over 5 years of experience creating 
+              I'm a passionate Full Stack Developer SEBSO with over 5 years of experience creating 
               innovative web applications. I specialize in modern technologies like React, 
               TypeScript, and Node.js.
             </p>

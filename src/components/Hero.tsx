@@ -157,7 +157,7 @@ export function Hero() {
             transition={{ delay: 1, duration: 0.6 }}
           >
             <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-2 cursor-pointer"
               onClick={() => window.open(personalInfo.resumeUrl, '_blank')}
             >
               <Download size={18} />

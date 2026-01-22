@@ -78,7 +78,7 @@ export function Navigation() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 onClick={() => handleNavClick(item.href)}
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-300 relative group"
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-300 relative group cursor-pointer"
               >
                 {item.name}
                 <motion.span
@@ -90,7 +90,7 @@ export function Navigation() {
             
             <Button 
               variant="outline" 
-              className="ml-4 group relative overflow-hidden"
+              className="ml-4 group relative overflow-hidden cursor-pointer"
               onClick={() => handleNavClick('#contact')}
             >
               <span className="relative z-10">Contact</span>
@@ -102,7 +102,7 @@ export function Navigation() {
           <Button
             variant="ghost"
             size="sm"
-            className="md:hidden p-2"
+            className="md:hidden p-2 cursor-pointer"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -131,7 +131,7 @@ export function Navigation() {
                   }}
                   transition={{ delay: index * 0.1, duration: 0.3 }}
                   onClick={() => handleNavClick(item.href)}
-                  className="block w-full text-left px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-300"
+                  className="block w-full text-left px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-300 cursor-pointer"
                 >
                   {item.name}
                 </motion.button>
@@ -139,7 +139,7 @@ export function Navigation() {
               <div className="px-2 pt-2 pb-4">
                 <Button 
                   variant="outline" 
-                  className="w-full group relative overflow-hidden"
+                  className="w-full group relative overflow-hidden cursor-pointer"
                   onClick={() => handleNavClick('#contact')}
                 >
                   <span className="relative z-10">Contact</span>

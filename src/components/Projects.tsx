@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 
 const projects = [
   {
-    title: 'E-Commerce Platform',
+    title: 'Metal Fabrication Slovakia',
     description: 'A modern e-commerce platform built with React, TypeScript, and Node.js',
     tech: ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
     image: '🛍️',

@@ -1,0 +1,21 @@
+# CODEOWNERS
+
+# Všetky zmeny vyžadujú review
+* @Kutis9
+
+# Deployment a CI/CD konfigurácia
+.github/ @Kutis9
+.github/workflows/ @Kutis9
+vite.config.ts @Kutis9
+tsconfig*.json @Kutis9
+
+# Komponenty
+src/components/ @Kutis9
+
+# Konfigurácia a utility
+src/config/ @Kutis9
+src/assets/ @Kutis9
+
+# Špecifické komponenty - ak máte ďalších maintainerov
+# src/components/Hero.tsx @Kutis9
+# src/components/Navigation.tsx @Kutis9

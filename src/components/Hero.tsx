@@ -157,7 +157,7 @@ export function Hero() {
             transition={{ delay: 1, duration: 0.6 }}
           >
             <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-2 cursor-pointer"
               onClick={() => window.open(personalInfo.resumeUrl, '_blank')}
             >
               <Download size={18} />
@@ -168,7 +168,7 @@ export function Hero() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="rounded-full w-10 h-10 p-0"
+                className="rounded-full w-10 h-10 p-0 cursor-pointer"
                 onClick={() => window.open(personalInfo.links.github, '_blank')}
               >
                 <Github size={18} />
@@ -176,7 +176,7 @@ export function Hero() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="rounded-full w-10 h-10 p-0"
+                className="rounded-full w-10 h-10 p-0 cursor-pointer"
                 onClick={() => window.open(personalInfo.links.linkedin, '_blank')}
               >
                 <Linkedin size={18} />
@@ -184,7 +184,7 @@ export function Hero() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="rounded-full w-10 h-10 p-0"
+                className="rounded-full w-10 h-10 p-0 cursor-pointer"
                 onClick={() => window.open(`mailto:${personalInfo.email}`, '_self')}
               >
                 <Mail size={18} />

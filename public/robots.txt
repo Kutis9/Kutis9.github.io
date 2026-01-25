@@ -1,0 +1,2 @@
+# Allow all search engines to index all pages
+User-agent: *

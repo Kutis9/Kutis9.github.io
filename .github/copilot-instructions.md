@@ -71,6 +71,159 @@ npm run preview      # Preview production build locally
 - Use **Context7 tool** for retrieving up-to-date documentation during development
 - Follow **modern React patterns** with hooks and functional components
 
+## GitHub Issues Workflow
+**IMPORTANT**: For every implementation task, create a GitHub Issue first before starting development.
+
+### Issue Creation Guidelines
+Every issue should include:
+1. **Clear Title**: Concise description of the task (e.g., "Add SEO meta tags to index.html")
+2. **Detailed Description**: What needs to be done and why
+3. **Requirements Checklist**: Specific implementation tasks with `- [ ]` checkboxes
+4. **Acceptance Criteria**: How to verify the task is complete
+5. **Technical Details**: 
+   - Files to modify
+   - Technologies involved
+   - Dependencies/blockers
+6. **Labels**: feature/bug/enhancement/documentation
+7. **Priority**: P0 (critical), P1 (important), P2 (nice-to-have)
+
+### Issue Template Example
+```markdown
+**Title:** [Feature] Add dark mode toggle
+
+**Description:**
+Implement dark mode functionality with system preference detection and manual toggle.
+
+**Requirements:**
+- [ ] Create theme context for state management
+- [ ] Add toggle button in navigation
+- [ ] Design dark color palette
+- [ ] Update all components for dark mode support
+- [ ] Save preference to localStorage
+- [ ] Detect system preference on initial load
+
+**Acceptance Criteria:**
+- Toggle switches between light/dark modes smoothly
+- Preference persists across page reloads
+- System preference is respected on first visit
+
+**Technical Details:**
+- Files: src/contexts/ThemeContext.tsx, src/components/Navigation.tsx, index.css
+- Tech: React Context API, localStorage, CSS variables
+- Estimate: 8 hours
+
+**Dependencies:** None
+```
+
+### Implementation Approaches
+
+#### **Option 1: Manual Implementation (with Copilot assistance)**
+Use this when you want full control over the implementation:
+1. Create issue on GitHub
+2. Create local branch: `git checkout -b feature/issue-<number>-<short-name>`
+3. Reference issue in commits: `git commit -m "feat: add dark mode toggle (#123)"`
+4. Use Copilot Chat in VS Code for coding assistance
+5. Push branch and create Pull Request
+6. In PR description, add `Closes #123` to auto-close issue on merge
+7. Request review (or self-review)
+8. Merge to main
+
+**Branch Naming Convention:**
+- Features: `feature/issue-123-dark-mode`
+- Bugs: `fix/issue-45-broken-link`
+- Docs: `docs/issue-78-update-readme`
+
+#### **Option 2: Copilot Coding Agent (automated implementation)**
+Use this for well-defined tasks where you want automated implementation:
+1. Create detailed issue on GitHub (must be very specific)
+2. Assign issue to Copilot:
+   - **Via GitHub UI**: Click "Assignees" → select @copilot
+   - **Via Copilot Chat**: Use command `@copilot implement issue #123`
+   - **Via mcp_github tool**: Use `mcp_github_assign_copilot_to_issue`
+3. Copilot coding agent will:
+   - Analyze the issue and codebase
+   - Create a new branch automatically
+   - Implement the solution following project conventions
+   - Run validation checks (lint, build)
+   - Create Pull Request with implementation
+   - Add you as reviewer
+4. Review the PR:
+   - Check code quality and correctness
+   - Test functionality locally: `git fetch && git checkout <branch-name>`
+   - Request changes via PR comments if needed
+   - Approve and merge when satisfied
+5. Issue closes automatically when PR is merged
+
+**Best Practices for Copilot Agent Issues:**
+- Be very specific in requirements
+- Include code examples or references
+- Mention files that need changes
+- List edge cases to handle
+- Reference existing patterns in codebase
+- Add test requirements if applicable
+
+### Workflow Decision Guide
+
+**Use Manual Implementation when:**
+- Task requires creative problem-solving
+- You want to learn/understand the implementation
+- Task involves complex business logic
+- Multiple approaches need evaluation
+- Task is experimental or exploratory
+
+**Use Copilot Coding Agent when:**
+- Task is well-defined and straightforward
+- Following established patterns
+- Repetitive implementations (e.g., similar components)
+- Boilerplate code generation
+- Refactoring with clear objectives
+- Time-sensitive tasks
+
+### Issue Lifecycle
+```
+[Open] → [In Progress] → [PR Created] → [Review] → [Merged] → [Closed]
+   ↓           ↓              ↓             ↓           ↓
+ Create    Assign to    Agent opens    You review   Auto-close
+ Issue    self/agent       PR          and merge    on merge
+```
+
+### Linking Issues and PRs
+Always link PRs to issues using GitHub keywords in PR description:
+- `Closes #123` - Closes issue when PR is merged
+- `Fixes #123` - Same as Closes
+- `Resolves #123` - Same as Closes
+- `Related to #123` - Links without closing
+
+### Project Board Integration (Optional)
+If using GitHub Projects:
+- Move issues through columns: To Do → In Progress → Review → Done
+- Automate with GitHub Actions workflows
+- Track sprint progress visually
+
+### Example Commands for Copilot Agent
+
+**Assign Copilot to existing issue:**
+```
+@copilot implement issue #123
+```
+
+**Create issue and assign in one step:**
+```
+@copilot create an issue to add SEO meta tags and implement it
+```
+
+**Request changes on Copilot's PR:**
+```
+Comment on PR: "@copilot please update the color scheme to use our brand colors from config"
+```
+
+### Integration with NEXT_STEPS.md
+Before starting any task from NEXT_STEPS.md:
+1. Create corresponding GitHub Issue
+2. Link to NEXT_STEPS.md section (e.g., "Implements Task 1.1 from NEXT_STEPS.md")
+3. Choose implementation approach (manual or agent)
+4. Update NEXT_STEPS.md status when issue is closed
+
 ## MCP Context7 Integration Protocol
 **CRITICAL**: Always use MCP Context7 tool for documentation queries before implementing any feature or answering technical questions.
 

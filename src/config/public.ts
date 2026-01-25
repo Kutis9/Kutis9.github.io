@@ -18,7 +18,7 @@ export const publicInfo = {
   // Public social links - these are meant to be shared anyway
   socialLinks: {
     github: "https://github.com/Kutis9",
-    linkedin: "https://linkedin.com/in/your-profile", // Update with your actual profile
+    linkedin: "https://www.linkedin.com/in/lukáš-kuťka-76485832a", // Update with your actual profile
     portfolio: "https://kutis9.github.io"
   },
   

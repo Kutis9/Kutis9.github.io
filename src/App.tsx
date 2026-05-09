@@ -22,9 +22,7 @@ function App() {
     <div className="min-h-screen">
       <Navigation />
       <main>
-        <section id="home">
-          <Hero />
-        </section>
+        <Hero />
         <Suspense fallback={<ComponentLoader />}>
           <About />
         </Suspense>

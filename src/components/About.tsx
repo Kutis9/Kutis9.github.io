@@ -1,6 +1,12 @@
 import { motion } from 'motion/react';
+import { personalInfo } from '../config';
 
 export function About() {
+  const skills = [
+    'React', 'TypeScript', 'Node.js', 'Next.js',
+    'Tailwind CSS', 'Vite', 'PostgreSQL', 'Git',
+  ];
+
   return (
     <section id="about" className="py-20">
       <div className="container mx-auto px-6">
@@ -22,8 +28,21 @@ export function About() {
             </p>
             <p className="text-lg text-gray-600 leading-relaxed">
               When I'm not coding, you can find me exploring new technologies, contributing to 
-              open source projects, or enjoying the great outdoors in San Francisco.
+              open source projects, or enjoying the great outdoors in {personalInfo.location}.
             </p>
+            <div className="pt-6">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Tech Stack</h3>
+              <div className="flex flex-wrap justify-center gap-3">
+                {skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-4 py-2 bg-blue-50 text-blue-700 font-medium text-sm rounded-full border border-blue-100"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>

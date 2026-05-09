@@ -157,8 +157,9 @@ export function Hero() {
             transition={{ delay: 1, duration: 0.6 }}
           >
             <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white gap-2 cursor-pointer"
-              onClick={() => window.open(personalInfo.resumeUrl, '_blank')}
+              className="bg-blue-400 text-white gap-2 cursor-not-allowed opacity-60"
+              disabled
+              title="CV coming soon"
             >
               <Download size={18} />
               Download CV

@@ -5,7 +5,7 @@ import {
   ClipboardList, Palette, ShoppingBag, X, ShoppingCart, Plus, Minus,
   Layers, Box, Wrench, CheckCircle2, Circle, Clock,
   LayoutDashboard, Users, Settings, Play, Folder, Package, Search, Truck,
-  Moon, Sun, Copy, Check, Code2, AlertCircle, Info, ToggleLeft,
+  Moon, Sun, Copy, Check, Code2, AlertCircle, Info, ToggleLeft, ArrowLeft, Send, Trash2, Calendar,
 } from 'lucide-react';
 
 // ─── ECOMMERCE APP ────────────────────────────────────────────────────────────
@@ -28,6 +28,16 @@ function EcommerceApp() {
   const [cartOpen, setCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  type CheckoutStep = 'cart' | 'form' | 'success';
+  interface Toast { id: number; message: string; }
+  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('cart');
+  const [orderForm, setOrderForm] = useState({ company: '', email: '', country: 'Slovakia' });
+  const [orderNumber, setOrderNumber] = useState('');
+  const [formError, setFormError] = useState('');
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  const [quoteSent, setQuoteSent] = useState(false);
+  const [quoteForm, setQuoteForm] = useState({ product: PRODUCTS[0].name, qty: 1, company: '', email: '' });
 
   const categories = ['All', 'Structural', 'Sheets', 'Profiles'];
   const filtered = PRODUCTS.filter(p =>
@@ -45,6 +55,9 @@ function EcommerceApp() {
     setCart(prev => {
       const existing = prev.find(i => i.id === product.id);
       if (existing) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+      const toastId = Date.now();
+      setToasts(prevToasts => [...prevToasts, { id: toastId, message: `${product.name.slice(0, 22)} added to cart` }]);
+      setTimeout(() => setToasts(prevToasts => prevToasts.filter(t => t.id !== toastId)), 2000);
       return [...prev, { id: product.id, name: product.name, price: product.price, qty: 1 }];
     });
   };
@@ -54,6 +67,40 @@ function EcommerceApp() {
 
   const removeFromCart = (id: string) => setCart(prev => prev.filter(i => i.id !== id));
   const inCart = (id: string) => cart.some(i => i.id === id);
+  const isOrderFormValid = orderForm.company.trim().length > 0 && orderForm.email.includes('@');
+
+  const closeCart = () => {
+    setCartOpen(false);
+    setCheckoutStep('cart');
+    setFormError('');
+  };
+
+  const closeQuote = () => {
+    setQuoteOpen(false);
+    setQuoteSent(false);
+  };
+
+  const resetQuoteForm = () => {
+    setQuoteOpen(false);
+    setQuoteSent(false);
+    setQuoteForm({ product: PRODUCTS[0].name, qty: 1, company: '', email: '' });
+  };
+
+  const placeOrder = () => {
+    if (!isOrderFormValid) {
+      setFormError('Please fill company name and a valid email.');
+      return;
+    }
+    setFormError('');
+    setOrderNumber(Math.floor(100000 + Math.random() * 900000).toString());
+    setCheckoutStep('success');
+  };
+
+  const sendQuote = () => {
+    if (quoteForm.company.trim() && quoteForm.email.includes('@')) {
+      setQuoteSent(true);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white relative overflow-hidden" style={{ fontFamily: 'system-ui, sans-serif' }}>
@@ -98,7 +145,10 @@ function EcommerceApp() {
           <p className="text-white font-bold text-sm leading-tight">Premium Steel & Metal Products</p>
           <p className="text-slate-400 text-[11px] mt-0.5">B2B supply across Slovakia & EU</p>
         </div>
-        <button className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold rounded-lg cursor-pointer transition-colors whitespace-nowrap">
+        <button
+          onClick={() => setQuoteOpen(true)}
+          className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold rounded-lg cursor-pointer transition-colors whitespace-nowrap"
+        >
           Request Quote
         </button>
       </div>
@@ -194,7 +244,7 @@ function EcommerceApp() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 z-10"
-              onClick={() => setCartOpen(false)}
+              onClick={closeCart}
             />
             <motion.div
               initial={{ x: '100%' }}
@@ -205,82 +255,328 @@ function EcommerceApp() {
             >
               <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-slate-50">
                 <div className="flex items-center gap-2">
+                  {checkoutStep === 'form' && (
+                    <button
+                      onClick={() => { setCheckoutStep('cart'); setFormError(''); }}
+                      className="p-1 -ml-1 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4 text-slate-600" />
+                    </button>
+                  )}
                   <ShoppingCart className="w-4 h-4 text-slate-600" />
-                  <h3 className="font-bold text-slate-900 text-sm">Shopping Cart</h3>
-                  {totalItems > 0 && (
+                  <h3 className="font-bold text-slate-900 text-sm">
+                    {checkoutStep === 'form' ? 'Shipping Details' : 'Shopping Cart'}
+                  </h3>
+                  {checkoutStep === 'cart' && totalItems > 0 && (
                     <span className="bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{totalItems}</span>
                   )}
                 </div>
-                <button onClick={() => setCartOpen(false)} className="p-1.5 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors">
+                <button onClick={closeCart} className="p-1.5 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors">
                   <X className="w-4 h-4 text-slate-500" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
-                {cart.length === 0 ? (
-                  <div className="text-center py-10 text-slate-400">
-                    <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                    <p className="text-sm font-medium">Cart is empty</p>
-                    <p className="text-xs mt-1">Add products from the catalog</p>
-                  </div>
-                ) : (
-                  cart.map(item => (
-                    <div key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-900 leading-snug">{item.name}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">€{item.price.toFixed(2)} / pc</p>
+              <div className="flex-1 overflow-hidden">
+                <AnimatePresence mode="wait">
+                  {checkoutStep === 'cart' ? (
+                    <motion.div
+                      key={checkoutStep}
+                      initial={{ x: 24, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -24, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="h-full flex flex-col"
+                    >
+                      <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+                        {cart.length === 0 ? (
+                          <div className="text-center py-10 text-slate-400">
+                            <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                            <p className="text-sm font-medium">Cart is empty</p>
+                            <p className="text-xs mt-1">Add products from the catalog</p>
+                          </div>
+                        ) : (
+                          cart.map(item => (
+                            <div key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold text-slate-900 leading-snug">{item.name}</p>
+                                <p className="text-[10px] text-slate-400 mt-0.5">€{item.price.toFixed(2)} / pc</p>
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                <span className="text-sm font-bold text-orange-600">€{(item.qty * item.price).toFixed(2)}</span>
+                                <div className="flex items-center gap-1">
+                                  <button onClick={() => updateQty(item.id, -1)} className="w-5 h-5 bg-slate-200 hover:bg-slate-300 rounded flex items-center justify-center cursor-pointer transition-colors">
+                                    <Minus className="w-2.5 h-2.5 text-slate-600" />
+                                  </button>
+                                  <span className="text-xs font-bold text-slate-900 w-5 text-center">{item.qty}</span>
+                                  <button onClick={() => updateQty(item.id, 1)} className="w-5 h-5 bg-slate-200 hover:bg-orange-100 rounded flex items-center justify-center cursor-pointer transition-colors">
+                                    <Plus className="w-2.5 h-2.5 text-slate-600" />
+                                  </button>
+                                  <button onClick={() => removeFromCart(item.id)} className="ml-1 text-[10px] text-slate-400 hover:text-red-500 cursor-pointer transition-colors font-bold">×</button>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-sm font-bold text-orange-600">€{(item.qty * item.price).toFixed(2)}</span>
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => updateQty(item.id, -1)} className="w-5 h-5 bg-slate-200 hover:bg-slate-300 rounded flex items-center justify-center cursor-pointer transition-colors">
-                            <Minus className="w-2.5 h-2.5 text-slate-600" />
+                      {cart.length > 0 && (
+                        <div className="p-4 border-t border-slate-200 space-y-3 bg-slate-50">
+                          <div className="space-y-1.5">
+                            {remaining > 0 ? (
+                              <p className="text-[10px] text-slate-500 text-center flex items-center justify-center gap-1">
+                                <Truck className="w-3 h-3 text-slate-400" />
+                                €{remaining.toFixed(2)} away from free shipping
+                              </p>
+                            ) : (
+                              <p className="text-[10px] text-emerald-600 font-semibold text-center flex items-center justify-center gap-1">
+                                <Truck className="w-3 h-3" />
+                                Free shipping unlocked!
+                              </p>
+                            )}
+                            <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full"
+                                animate={{ width: `${shippingProgress}%` }}
+                                transition={{ duration: 0.4, ease: 'easeOut' }}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-slate-500">Subtotal</span>
+                            <span className="text-lg font-bold text-slate-900">€{totalPrice.toFixed(2)}</span>
+                          </div>
+                          <button
+                            onClick={() => { setCheckoutStep('form'); setFormError(''); }}
+                            className="w-full bg-[#0f172a] text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 cursor-pointer transition-colors"
+                          >
+                            Proceed to Checkout →
                           </button>
-                          <span className="text-xs font-bold text-slate-900 w-5 text-center">{item.qty}</span>
-                          <button onClick={() => updateQty(item.id, 1)} className="w-5 h-5 bg-slate-200 hover:bg-orange-100 rounded flex items-center justify-center cursor-pointer transition-colors">
-                            <Plus className="w-2.5 h-2.5 text-slate-600" />
-                          </button>
-                          <button onClick={() => removeFromCart(item.id)} className="ml-1 text-[10px] text-slate-400 hover:text-red-500 cursor-pointer transition-colors font-bold">×</button>
                         </div>
+                      )}
+                    </motion.div>
+                  ) : checkoutStep === 'form' ? (
+                    <motion.div
+                      key={checkoutStep}
+                      initial={{ x: 24, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -24, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="h-full overflow-y-auto p-4"
+                    >
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-700">Company Name</label>
+                          <input
+                            value={orderForm.company}
+                            onChange={e => {
+                              setOrderForm(prev => ({ ...prev, company: e.target.value }));
+                              if (formError) setFormError('');
+                            }}
+                            placeholder="Your company"
+                            className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-700">Email</label>
+                          <input
+                            value={orderForm.email}
+                            onChange={e => {
+                              setOrderForm(prev => ({ ...prev, email: e.target.value }));
+                              if (formError) setFormError('');
+                            }}
+                            type="email"
+                            placeholder="name@company.com"
+                            className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-700">Country</label>
+                          <select
+                            value={orderForm.country}
+                            onChange={e => setOrderForm(prev => ({ ...prev, country: e.target.value }))}
+                            className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                          >
+                            <option>Slovakia</option>
+                            <option>Czech Republic</option>
+                            <option>Austria</option>
+                            <option>Germany</option>
+                            <option>Poland</option>
+                            <option>Hungary</option>
+                          </select>
+                        </div>
+                        <button
+                          onClick={placeOrder}
+                          disabled={!isOrderFormValid}
+                          className="w-full bg-[#0f172a] text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Place Order →
+                        </button>
+                        {formError && <p className="text-xs text-red-500">{formError}</p>}
                       </div>
-                    </div>
-                  ))
-                )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={checkoutStep}
+                      initial={{ x: 24, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -24, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="h-full p-6 flex flex-col items-center justify-center text-center"
+                    >
+                      <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+                      <h4 className="mt-3 text-lg font-bold text-slate-900">Order Confirmed!</h4>
+                      <p className="mt-1 text-xs text-slate-500">Order number #{orderNumber}</p>
+                      <button
+                        onClick={() => {
+                          setCartOpen(false);
+                          setCheckoutStep('cart');
+                          setCart([]);
+                          setFormError('');
+                        }}
+                        className="mt-6 w-full bg-orange-500 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-orange-600 cursor-pointer transition-colors"
+                      >
+                        Continue Shopping
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              {cart.length > 0 && (
-                <div className="p-4 border-t border-slate-200 space-y-3 bg-slate-50">
-                  <div className="space-y-1.5">
-                    {remaining > 0 ? (
-                      <p className="text-[10px] text-slate-500 text-center flex items-center justify-center gap-1">
-                        <Truck className="w-3 h-3 text-slate-400" />
-                        €{remaining.toFixed(2)} away from free shipping
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-emerald-600 font-semibold text-center flex items-center justify-center gap-1">
-                        <Truck className="w-3 h-3" />
-                        Free shipping unlocked!
-                      </p>
-                    )}
-                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full"
-                        animate={{ width: `${shippingProgress}%` }}
-                        transition={{ duration: 0.4, ease: 'easeOut' }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-500">Subtotal</span>
-                    <span className="text-lg font-bold text-slate-900">€{totalPrice.toFixed(2)}</span>
-                  </div>
-                  <button className="w-full bg-[#0f172a] text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 cursor-pointer transition-colors">
-                    Proceed to Checkout →
-                  </button>
-                </div>
-              )}
             </motion.div>
           </>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {quoteOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 z-30"
+              onClick={closeQuote}
+            />
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="absolute inset-8 sm:inset-16 bg-white rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden max-w-sm mx-auto"
+            >
+              <AnimatePresence mode="wait">
+                {!quoteSent ? (
+                  <motion.div
+                    key="quote-form"
+                    initial={{ x: 24, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -24, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="h-full flex flex-col"
+                  >
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
+                      <h4 className="font-bold text-slate-900 text-sm">Request a Quote</h4>
+                      <button
+                        onClick={closeQuote}
+                        className="p-1.5 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors"
+                      >
+                        <X className="w-4 h-4 text-slate-500" />
+                      </button>
+                    </div>
+                    <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-700">Product</label>
+                        <select
+                          value={quoteForm.product}
+                          onChange={e => setQuoteForm(prev => ({ ...prev, product: e.target.value }))}
+                          className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                        >
+                          {PRODUCTS.map(product => (
+                            <option key={product.id} value={product.name}>{product.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-700">Quantity</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={quoteForm.qty}
+                          onChange={e => {
+                            const value = Number.parseInt(e.target.value, 10);
+                            setQuoteForm(prev => ({ ...prev, qty: Number.isNaN(value) ? 1 : Math.max(1, value) }));
+                          }}
+                          className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-700">Company Name</label>
+                        <input
+                          value={quoteForm.company}
+                          onChange={e => setQuoteForm(prev => ({ ...prev, company: e.target.value }))}
+                          placeholder="Your company"
+                          className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-700">Email</label>
+                        <input
+                          type="email"
+                          value={quoteForm.email}
+                          onChange={e => setQuoteForm(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="name@company.com"
+                          className="mt-1 w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300"
+                        />
+                      </div>
+                      <button
+                        onClick={sendQuote}
+                        className="w-full bg-[#0f172a] text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 cursor-pointer transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        Send Request →
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="quote-success"
+                    initial={{ x: 24, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -24, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="h-full p-6 flex flex-col items-center justify-center text-center"
+                  >
+                    <CheckCircle2 className="w-12 h-12 text-orange-500" />
+                    <h4 className="mt-3 text-lg font-bold text-slate-900">Quote Sent!</h4>
+                    <p className="mt-1 text-xs text-slate-500">We'll contact you within 24 hours.</p>
+                    <button
+                      onClick={resetQuoteForm}
+                      className="mt-6 w-full bg-orange-500 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-orange-600 cursor-pointer transition-colors"
+                    >
+                      Close
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <div className="absolute bottom-4 left-4 z-30 flex flex-col gap-2">
+        <AnimatePresence>
+          {toasts.map(toast => (
+            <motion.div
+              key={toast.id}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              className="flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl text-xs font-medium"
+            >
+              <ShoppingCart className="w-3 h-3 text-orange-400 flex-shrink-0" />
+              {toast.message}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -297,6 +593,7 @@ interface Task {
   priority: Priority;
   assignee: string;
   tags: string[];
+  dueDate?: string;
 }
 
 const PRIORITY_BADGE: Record<Priority, string> = {
@@ -309,20 +606,25 @@ const INITIAL_TASKS: Task[] = [
   { id: '1', title: 'Design system setup', status: 'done', priority: 'high', assignee: 'LK', tags: ['Design'] },
   { id: '2', title: 'Database schema', status: 'done', priority: 'high', assignee: 'LK', tags: ['Backend'] },
   { id: '3', title: 'Auth API endpoints', status: 'done', priority: 'high', assignee: 'LK', tags: ['API'] },
-  { id: '4', title: 'WebSocket server', status: 'doing', priority: 'high', assignee: 'LK', tags: ['Backend'] },
-  { id: '5', title: 'Task board UI', status: 'doing', priority: 'medium', assignee: 'LK', tags: ['Frontend'] },
-  { id: '6', title: 'Real-time sync', status: 'todo', priority: 'high', assignee: 'LK', tags: ['Feature'] },
+  { id: '4', title: 'WebSocket server', status: 'doing', priority: 'high', assignee: 'LK', tags: ['Backend'], dueDate: '2026-05-11' },
+  { id: '5', title: 'Task board UI', status: 'doing', priority: 'medium', assignee: 'LK', tags: ['Frontend'], dueDate: '2026-05-09' },
+  { id: '6', title: 'Real-time sync', status: 'todo', priority: 'high', assignee: 'LK', tags: ['Feature'], dueDate: '2026-05-14' },
   { id: '7', title: 'Email notifications', status: 'todo', priority: 'low', assignee: 'LK', tags: ['Feature'] },
-  { id: '8', title: 'Mobile responsive', status: 'todo', priority: 'medium', assignee: 'LK', tags: ['Frontend'] },
+  { id: '8', title: 'Mobile responsive', status: 'todo', priority: 'medium', assignee: 'LK', tags: ['Frontend'], dueDate: '2026-05-08' },
 ];
 
 function TaskManagerApp() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<Priority>('medium');
+  const [newTaskDueDate, setNewTaskDueDate] = useState<string>('');
   const [selectedProject, setSelectedProject] = useState('TaskFlow App');
   const [addingTo, setAddingTo] = useState<TaskStatus | null>(null);
   const [flashingTaskId, setFlashingTaskId] = useState<string | null>(null);
+  const [celebratingTaskId, setCelebratingTaskId] = useState<string | null>(null);
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
 
   const projects = ['TaskFlow App', 'Design System', 'API v2', 'Mobile'];
 
@@ -338,6 +640,18 @@ function TaskManagerApp() {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, status } : t));
     setFlashingTaskId(id);
     setTimeout(() => setFlashingTaskId(null), 600);
+    if (status === 'done') {
+      setCelebratingTaskId(id);
+      setTimeout(() => setCelebratingTaskId(null), 700);
+    }
+  };
+
+  const deleteTask = (id: string) => {
+    setDeletingIds(prev => new Set(prev).add(id));
+    setTimeout(() => {
+      setTasks(prev => prev.filter(t => t.id !== id));
+      setDeletingIds(prev => { const s = new Set(prev); s.delete(id); return s; });
+    }, 350);
   };
 
   const addTask = (status: TaskStatus) => {
@@ -349,9 +663,11 @@ function TaskManagerApp() {
       priority: newTaskPriority,
       assignee: 'LK',
       tags: [],
+      dueDate: newTaskDueDate || undefined,
     }]);
     setNewTaskTitle('');
     setNewTaskPriority('medium');
+    setNewTaskDueDate('');
     setAddingTo(null);
   };
 
@@ -402,6 +718,42 @@ function TaskManagerApp() {
         <span className="text-xs text-violet-400 font-bold whitespace-nowrap">{Math.round((doneTasks / tasks.length) * 100)}%</span>
       </div>
 
+      {/* Filter Bar */}
+      <div className="px-4 py-2 border-b border-white/10 flex-shrink-0 flex items-center gap-2 flex-wrap">
+        <div className="relative flex-shrink-0">
+          <Search className="w-3 h-3 text-slate-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search tasks..."
+            className="bg-white/5 border border-white/10 rounded-lg pl-7 pr-2.5 py-1 text-[11px] text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-violet-400 w-32"
+          />
+        </div>
+        <div className="flex gap-1">
+          {(['all', 'high', 'medium', 'low'] as const).map(p => (
+            <button
+              key={p}
+              onClick={() => setPriorityFilter(p)}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer capitalize ${
+                priorityFilter === p
+                  ? p === 'all' ? 'bg-violet-500/30 text-violet-300' : PRIORITY_BADGE[p as Priority] + ' ring-1 ring-current'
+                  : 'text-slate-600 bg-white/5 hover:bg-white/10'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        {(searchQuery || priorityFilter !== 'all') && (
+          <span className="text-[10px] text-slate-600 ml-auto">
+            {tasks.filter(t =>
+              (priorityFilter === 'all' || t.priority === priorityFilter) &&
+              (searchQuery === '' || t.title.toLowerCase().includes(searchQuery.toLowerCase()))
+            ).length} of {tasks.length} tasks
+          </span>
+        )}
+      </div>
+
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <div className="w-36 flex-shrink-0 border-r border-white/10 p-3 flex flex-col gap-1 overflow-y-auto">
@@ -444,7 +796,11 @@ function TaskManagerApp() {
         <div className="flex-1 overflow-x-auto overflow-y-hidden p-3">
           <div className="flex gap-3 h-full min-w-[480px]">
             {cols.map(col => {
-              const colTasks = tasks.filter(t => t.status === col.key);
+              const colTasks = tasks.filter(t =>
+                t.status === col.key &&
+                (priorityFilter === 'all' || t.priority === priorityFilter) &&
+                (searchQuery === '' || t.title.toLowerCase().includes(searchQuery.toLowerCase()))
+              );
               return (
                 <div key={col.key} className={`flex-1 flex flex-col min-w-0 rounded-xl overflow-hidden border border-white/5 ${col.bg}`}>
                   {/* Column Header */}
@@ -456,7 +812,7 @@ function TaskManagerApp() {
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] text-slate-600 bg-white/10 px-1.5 py-0.5 rounded-full font-medium">{colTasks.length}</span>
                       <button
-                        onClick={() => { setAddingTo(col.key); setNewTaskTitle(''); setNewTaskPriority('medium'); }}
+                        onClick={() => { setAddingTo(col.key); setNewTaskTitle(''); setNewTaskPriority('medium'); setNewTaskDueDate(''); }}
                         className="text-slate-500 hover:text-violet-400 transition-colors cursor-pointer p-0.5"
                       >
                         <Plus className="w-3.5 h-3.5" />
@@ -495,53 +851,99 @@ function TaskManagerApp() {
                           ))}
                         </div>
                         <div className="flex gap-1">
+                          {[
+                            { label: 'Today', value: new Date().toISOString().slice(0, 10) },
+                            { label: '+3d', value: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10) },
+                            { label: 'None', value: '' },
+                          ].map(d => (
+                            <button
+                              key={d.label}
+                              onClick={() => setNewTaskDueDate(d.value)}
+                              className={`flex-1 text-[9px] py-1 rounded cursor-pointer transition-colors ${
+                                newTaskDueDate === d.value
+                                  ? 'bg-violet-500/30 text-violet-300'
+                                  : 'bg-white/5 text-slate-600 hover:bg-white/10'
+                              }`}
+                            >
+                              {d.label}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="flex gap-1">
                           <button onClick={() => addTask(col.key)} className="text-[10px] bg-violet-600 text-white px-2 py-1 rounded-md cursor-pointer hover:bg-violet-700 transition-colors font-medium">Add</button>
                           <button onClick={() => setAddingTo(null)} className="text-[10px] text-slate-500 hover:text-slate-300 px-2 py-1 rounded-md cursor-pointer">Cancel</button>
                         </div>
                       </motion.div>
                     )}
-                    {colTasks.map(task => {
-                      const nextStatus: TaskStatus | null = col.key === 'todo' ? 'doing' : col.key === 'doing' ? 'done' : null;
-                      const prevStatus: TaskStatus | null = col.key === 'done' ? 'doing' : col.key === 'doing' ? 'todo' : null;
-                      const isFlashing = flashingTaskId === task.id;
-                      return (
-                        <motion.div
-                          key={task.id}
-                          layout
-                          transition={{ layout: { duration: 0.3 } }}
-                          className={`rounded-xl p-2.5 border transition-colors duration-300 ${
-                            isFlashing
-                              ? 'bg-violet-500/30 border-violet-400/50'
-                              : 'bg-white/10 hover:bg-white/15 border-white/5'
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${PRIORITY_BADGE[task.priority]}`}>
-                              {task.priority.slice(0, 3).toUpperCase()}
-                            </span>
-                            <p className="text-xs text-slate-200 leading-snug flex-1">{task.title}</p>
-                          </div>
-                          {task.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2 ml-0">
-                              {task.tags.map(tag => (
-                                <span key={tag} className="text-[9px] bg-violet-500/25 text-violet-300 px-1.5 py-0.5 rounded-full font-medium">{tag}</span>
-                              ))}
+                    <AnimatePresence initial={false}>
+                      {colTasks.map(task => {
+                        const nextStatus: TaskStatus | null = col.key === 'todo' ? 'doing' : col.key === 'doing' ? 'done' : null;
+                        const prevStatus: TaskStatus | null = col.key === 'done' ? 'doing' : col.key === 'doing' ? 'todo' : null;
+                        const isFlashing = flashingTaskId === task.id;
+                        const isDeleting = deletingIds.has(task.id);
+                        return (
+                          <motion.div
+                            key={task.id}
+                            layout
+                            exit={{ opacity: 0, scale: 0.9, x: -8 }}
+                            whileHover={{ scale: 1.01 }}
+                            transition={{ layout: { duration: 0.3 } }}
+                            className={`relative group rounded-xl p-2.5 border transition-colors duration-300 ${
+                              celebratingTaskId === task.id
+                                ? 'bg-emerald-500/20 border-emerald-400/40'
+                                : isFlashing
+                                  ? 'bg-violet-500/30 border-violet-400/50'
+                                  : 'bg-white/10 hover:bg-white/15 border-white/5'
+                            } ${isDeleting ? 'opacity-50 bg-red-500/10' : ''}`}
+                          >
+                            <button
+                              onClick={(e) => { e.stopPropagation(); deleteTask(task.id); }}
+                              className="absolute top-1.5 right-1.5 p-1 rounded opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                            <div className="flex items-start gap-2">
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5 ${PRIORITY_BADGE[task.priority]}`}>
+                                {task.priority.slice(0, 3).toUpperCase()}
+                              </span>
+                              <p className="text-xs text-slate-200 leading-snug flex-1 pr-4">{task.title}</p>
                             </div>
-                          )}
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex gap-1">
-                              {prevStatus && (
-                                <button onClick={() => move(task.id, prevStatus)} className="text-[9px] text-slate-500 hover:text-slate-200 bg-white/10 hover:bg-white/20 px-1.5 py-0.5 rounded cursor-pointer transition-all">← Back</button>
-                              )}
-                              {nextStatus && (
-                                <button onClick={() => move(task.id, nextStatus)} className="text-[9px] text-violet-400 hover:text-violet-200 bg-violet-500/10 hover:bg-violet-500/20 px-1.5 py-0.5 rounded cursor-pointer transition-all font-medium">Next →</button>
-                              )}
+                            {task.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2 ml-0">
+                                {task.tags.map(tag => (
+                                  <span key={tag} className="text-[9px] bg-violet-500/25 text-violet-300 px-1.5 py-0.5 rounded-full font-medium">{tag}</span>
+                                ))}
+                              </div>
+                            )}
+                            {task.dueDate && (() => {
+                              const today = new Date().toISOString().slice(0, 10);
+                              const due = task.dueDate;
+                              const isPast = due < today;
+                              const isToday = due === today;
+                              return (
+                                <div className={`flex items-center gap-1 mt-1.5 px-1.5 py-0.5 rounded text-[9px] font-medium w-fit ${
+                                  isPast ? 'bg-red-500/15 text-red-400' : isToday ? 'bg-amber-500/15 text-amber-400' : 'bg-white/5 text-slate-500'
+                                }`}>
+                                  <Calendar className="w-2.5 h-2.5" />
+                                  {isToday ? 'Due today' : isPast ? 'Overdue' : due.slice(5)}
+                                </div>
+                              );
+                            })()}
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex gap-1">
+                                {prevStatus && (
+                                  <button onClick={() => move(task.id, prevStatus)} className="text-[9px] text-slate-500 hover:text-slate-200 bg-white/10 hover:bg-white/20 px-1.5 py-0.5 rounded cursor-pointer transition-all">← Back</button>
+                                )}
+                                {nextStatus && (
+                                  <button onClick={() => move(task.id, nextStatus)} className="text-[9px] text-violet-400 hover:text-violet-200 bg-violet-500/10 hover:bg-violet-500/20 px-1.5 py-0.5 rounded cursor-pointer transition-all font-medium">Next →</button>
+                                )}
+                              </div>
+                              <div className="w-4 h-4 bg-violet-700 rounded-full flex items-center justify-center text-[8px] text-white font-bold flex-shrink-0">{task.assignee}</div>
                             </div>
-                            <div className="w-4 h-4 bg-violet-700 rounded-full flex items-center justify-center text-[8px] text-white font-bold flex-shrink-0">{task.assignee}</div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
                   </div>
                 </div>
               );
@@ -574,20 +976,23 @@ const SWITCH_ITEMS: { key: SwitchKey; label: string; desc: string }[] = [
 ];
 
 function UILibraryApp() {
-  const [activeComp, setActiveComp] = useState<UIComp>('button');
+  type ActivePage = UIComp | 'intro' | 'install' | 'theming' | 'darkmode';
+
+  const [activePage, setActivePage] = useState<ActivePage>('button');
   const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
   const [darkPreview, setDarkPreview] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [switches, setSwitches] = useState<Record<SwitchKey, boolean>>({ notifications: true, autosave: false, darkmode: true });
   const [inputVal, setInputVal] = useState('');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteQuery, setPaletteQuery] = useState('');
+  const [paletteIndex, setPaletteIndex] = useState(0);
 
-  const meta = COMP_META[activeComp];
+  const isNavPage = (p: ActivePage): boolean => ['intro', 'install', 'theming', 'darkmode'].includes(p as string);
+
+  const currentComp: UIComp = isNavPage(activePage) ? 'button' : (activePage as UIComp);
+  const meta = COMP_META[currentComp];
   const dp = darkPreview;
-
-  const copyCode = () => {
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
 
   const SIDEBAR_ITEMS: { key: UIComp; label: string; icon: ReactNode }[] = [
     { key: 'button', label: 'Button', icon: <Box className="w-3 h-3" /> },
@@ -597,6 +1002,40 @@ function UILibraryApp() {
     { key: 'card',   label: 'Card',   icon: <Layers className="w-3 h-3" /> },
     { key: 'switch', label: 'Switch', icon: <ToggleLeft className="w-3 h-3" /> },
   ];
+
+  const CODE_STRINGS: Record<UIComp, string> = {
+    button: `import { Button } from "@nexaui/react"\n\nexport function ButtonDemo() {\n  return (\n    <div className="flex gap-2 flex-wrap">\n      <Button>Default</Button>\n      <Button variant="secondary">Secondary</Button>\n      <Button variant="destructive">Delete</Button>\n      <Button variant="ghost">Ghost</Button>\n    </div>\n  )\n}`,
+    badge: `import { Badge } from "@nexaui/react"\n\nexport function BadgeDemo() {\n  return (\n    <div className="flex gap-2 flex-wrap">\n      <Badge>Default</Badge>\n      <Badge variant="success">Success</Badge>\n      <Badge variant="warning">Warning</Badge>\n      <Badge variant="destructive">Error</Badge>\n    </div>\n  )\n}`,
+    alert: `import { Alert, AlertTitle, AlertDescription } from "@nexaui/react"\n\nexport function AlertDemo() {\n  return (\n    <Alert>\n      <Info className="h-4 w-4" />\n      <AlertTitle>Heads up!</AlertTitle>\n      <AlertDescription>\n        You can add components using the CLI.\n      </AlertDescription>\n    </Alert>\n  )\n}`,
+    input: `import { Input, Label } from "@nexaui/react"\n\nexport function InputDemo() {\n  return (\n    <div className="space-y-2">\n      <Label htmlFor="email">Email</Label>\n      <Input\n        id="email"\n        type="email"\n        placeholder="Enter your email"\n      />\n    </div>\n  )\n}`,
+    card: `import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@nexaui/react"\n\nexport function CardDemo() {\n  return (\n    <Card>\n      <CardHeader>\n        <CardTitle>Create project</CardTitle>\n      </CardHeader>\n      <CardContent>\n        {/* form fields */}\n      </CardContent>\n      <CardFooter>\n        <Button>Deploy</Button>\n      </CardFooter>\n    </Card>\n  )\n}`,
+    switch: `import { Switch, Label } from "@nexaui/react"\n\nexport function SwitchDemo() {\n  return (\n    <div className="flex items-center gap-2">\n      <Switch id="dark-mode" />\n      <Label htmlFor="dark-mode">\n        Dark mode\n      </Label>\n    </div>\n  )\n}`,
+  };
+
+  const copyCode = async () => {
+    const activePage_UIComp = activePage as UIComp;
+    if (!CODE_STRINGS[activePage_UIComp]) return;
+    try {
+      await navigator.clipboard.writeText(CODE_STRINGS[activePage_UIComp]);
+      setCopyStatus('success');
+    } catch {
+      setCopyStatus('error');
+    }
+    setTimeout(() => setCopyStatus('idle'), 1500);
+  };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setPaletteOpen(p => !p);
+        setPaletteQuery('');
+        setPaletteIndex(0);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const preview: Record<UIComp, ReactNode> = {
     button: (
@@ -883,8 +1322,15 @@ function UILibraryApp() {
     ),
   };
 
+  const paletteFiltered = SIDEBAR_ITEMS.filter(item =>
+    paletteQuery === '' ||
+    item.label.toLowerCase().includes(paletteQuery.toLowerCase()) ||
+    COMP_META[item.key].description.toLowerCase().includes(paletteQuery.toLowerCase())
+  );
+  const paletteClamped = Math.min(paletteIndex, Math.max(0, paletteFiltered.length - 1));
+
   return (
-    <div className="flex h-full overflow-hidden" style={{ fontFamily: 'system-ui, sans-serif' }}>
+    <div className="relative flex h-full overflow-hidden" style={{ fontFamily: 'system-ui, sans-serif' }}>
       {/* ── Sidebar ── */}
       <div className="w-44 flex-shrink-0 bg-[#0f0f0f] flex flex-col overflow-hidden border-r border-white/[0.06]">
         {/* Logo */}
@@ -897,18 +1343,36 @@ function UILibraryApp() {
         </div>
         {/* Search */}
         <div className="px-3 py-2 border-b border-white/[0.06] flex-shrink-0">
-          <div className="flex items-center gap-2 bg-white/5 rounded-lg px-2.5 py-1.5 border border-white/[0.06]">
+          <button
+            onClick={() => { setPaletteOpen(true); setPaletteQuery(''); setPaletteIndex(0); }}
+            className="flex items-center gap-2 bg-white/5 rounded-lg px-2.5 py-1.5 border border-white/[0.06] w-full text-left cursor-pointer hover:bg-white/10 transition-colors"
+          >
             <Search className="w-3 h-3 text-slate-600 flex-shrink-0" />
-            <span className="text-[11px] text-slate-700">Search...</span>
+            <span className="text-[11px] text-slate-700 flex-1">Search...</span>
             <span className="ml-auto text-[9px] bg-white/8 text-slate-600 px-1 rounded font-mono">⌘K</span>
-          </div>
+          </button>
         </div>
         {/* Navigation */}
         <div className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
           <div>
             <p className="text-[9px] font-bold text-slate-700 uppercase tracking-widest px-2 mb-1.5">Getting Started</p>
-            {['Introduction', 'Installation', 'Theming', 'Dark Mode'].map(item => (
-              <button key={item} className="w-full text-left px-2.5 py-1.5 text-[11px] text-slate-600 hover:text-slate-300 hover:bg-white/5 rounded-md cursor-pointer transition-colors">{item}</button>
+            {[
+              { label: 'Introduction', key: 'intro' as ActivePage },
+              { label: 'Installation', key: 'install' as ActivePage },
+              { label: 'Theming', key: 'theming' as ActivePage },
+              { label: 'Dark Mode', key: 'darkmode' as ActivePage },
+            ].map(item => (
+              <button
+                key={item.key}
+                onClick={() => setActivePage(item.key)}
+                className={`w-full text-left px-2.5 py-1.5 text-[11px] rounded-md cursor-pointer transition-colors ${
+                  activePage === item.key
+                    ? 'bg-violet-500/20 text-violet-300 font-semibold'
+                    : 'text-slate-600 hover:text-slate-300 hover:bg-white/5'
+                }`}
+              >
+                {item.label}
+              </button>
             ))}
           </div>
           <div>
@@ -916,9 +1380,9 @@ function UILibraryApp() {
             {SIDEBAR_ITEMS.map(item => (
               <button
                 key={item.key}
-                onClick={() => { setActiveComp(item.key); setActiveTab('preview'); }}
+                onClick={() => { setActivePage(item.key); setActiveTab('preview'); }}
                 className={`w-full text-left flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                  activeComp === item.key
+                  activePage === item.key
                     ? 'bg-violet-500/20 text-violet-300 font-semibold'
                     : 'text-slate-600 hover:text-slate-300 hover:bg-white/5'
                 }`}
@@ -938,96 +1402,316 @@ function UILibraryApp() {
 
       {/* ── Main ── */}
       <div className="flex-1 flex flex-col overflow-hidden bg-white">
-        {/* Top bar */}
-        <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-gray-900">{meta.label}</h2>
-              <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono flex-shrink-0">{meta.version}</span>
-              {meta.isNew && <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-bold flex-shrink-0">NEW</span>}
-            </div>
-            <p className="text-xs text-gray-400 mt-0.5 truncate">{meta.description}</p>
-          </div>
-          <button
-            onClick={() => setDarkPreview(p => !p)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 cursor-pointer transition-colors flex-shrink-0 ml-4"
-          >
-            {dp ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-            {dp ? 'Light' : 'Dark'}
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex items-end px-6 border-b border-gray-100 flex-shrink-0">
-          {(['preview', 'code'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium capitalize transition-all cursor-pointer border-b-2 -mb-px ${
-                activeTab === tab
-                  ? 'border-violet-500 text-violet-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-700'
-              }`}
-            >
-              {tab === 'code' && <Code2 className="w-3 h-3" />}
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Content area */}
-        <div className="flex-1 overflow-y-auto">
-          <AnimatePresence mode="wait">
-            {activeTab === 'preview' ? (
+        {isNavPage(activePage) ? (
+          <div className="flex-1 overflow-y-auto p-6">
+            <AnimatePresence mode="wait">
               <motion.div
-                key="preview"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                key={activePage}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.15 }}
-                className={`p-6 min-h-full transition-colors duration-300 ${dp ? 'bg-[#0f0f0f]' : 'bg-[#f9fafb]'}`}
+                className="max-w-lg"
               >
-                <div className={`rounded-2xl border p-6 flex items-center justify-center min-h-48 transition-colors duration-300 ${dp ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
-                  {preview[activeComp]}
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="code"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="p-6"
-              >
-                <div className="rounded-xl overflow-hidden bg-[#1e1e2e] border border-white/5">
-                  <div className="flex items-center justify-between px-4 py-2.5 bg-[#252535] border-b border-white/[0.06]">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-[#ff5f57]" />
-                      <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
-                      <div className="w-2 h-2 rounded-full bg-[#28c840]" />
-                      <span className="text-[10px] text-slate-500 font-mono ml-2">demo.tsx</span>
-                    </div>
-                    <button
-                      onClick={copyCode}
-                      className="flex items-center gap-1.5 text-[10px] font-medium cursor-pointer transition-colors px-2 py-1 rounded hover:bg-white/10"
-                    >
-                      {copied ? (
-                        <><Check className="w-3 h-3 text-emerald-400" /><span className="text-emerald-400">Copied!</span></>
-                      ) : (
-                        <><Copy className="w-3 h-3 text-slate-500" /><span className="text-slate-400">Copy</span></>
-                      )}
-                    </button>
+                {activePage === 'intro' && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900">Introduction</h2>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      NexaUI is a beautifully designed, accessible component library built on top of Radix UI primitives and styled with Tailwind CSS. Copy and paste components directly into your apps.
+                    </p>
+                    {[
+                      { icon: '⚡', title: 'Fast by default', desc: 'Tree-shakeable, zero runtime overhead.' },
+                      { icon: '♿', title: 'Accessible', desc: 'Built on Radix UI for full a11y compliance.' },
+                      { icon: '🎨', title: 'Customizable', desc: 'CSS variables and Tailwind utilities.' },
+                    ].map(f => (
+                      <div key={f.title} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <span className="text-xl">{f.icon}</span>
+                        <div>
+                          <p className="text-xs font-bold text-gray-800">{f.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{f.desc}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <pre className="p-5 text-[10px] leading-5 overflow-x-auto font-mono whitespace-pre-wrap">
-                    {codeContent[activeComp]}
-                  </pre>
-                </div>
+                )}
+                {activePage === 'install' && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900">Installation</h2>
+                    <p className="text-sm text-gray-600">Get started in 2 steps:</p>
+                    <div className="rounded-xl overflow-hidden bg-[#1e1e2e] border border-white/5">
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-[#252535] border-b border-white/[0.06]">
+                        <div className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                        <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
+                        <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+                        <span className="text-[10px] text-slate-500 font-mono ml-2">terminal</span>
+                      </div>
+                      <pre className="p-4 text-xs font-mono text-emerald-400">
+                        {'npm install @nexaui/react\n\n'}
+                        <span className="text-slate-500">{'# or with pnpm\n'}</span>
+                        {'pnpm add @nexaui/react'}
+                      </pre>
+                    </div>
+                    <div className="rounded-xl overflow-hidden bg-[#1e1e2e] border border-white/5">
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-[#252535] border-b border-white/[0.06]">
+                        <div className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                        <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
+                        <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+                        <span className="text-[10px] text-slate-500 font-mono ml-2">app.tsx</span>
+                      </div>
+                      <pre className="p-4 text-xs font-mono">
+                        <span className="text-violet-400">import</span>
+                        {' '}
+                        <span className="text-slate-300">{'{ Button }'}</span>
+                        {' '}
+                        <span className="text-violet-400">from</span>
+                        {' '}
+                        <span className="text-emerald-300">"@nexaui/react"</span>
+                        {'\n'}
+                        <span className="text-violet-400">import</span>
+                        {' '}
+                        <span className="text-emerald-300">"@nexaui/react/styles.css"</span>
+                      </pre>
+                    </div>
+                  </div>
+                )}
+                {activePage === 'theming' && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900">Theming</h2>
+                    <p className="text-sm text-gray-600">Customize NexaUI with CSS variables in your global stylesheet:</p>
+                    <div className="rounded-xl overflow-hidden bg-[#1e1e2e] border border-white/5">
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-[#252535] border-b border-white/[0.06]">
+                        <div className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                        <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
+                        <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+                        <span className="text-[10px] text-slate-500 font-mono ml-2">globals.css</span>
+                      </div>
+                      <pre className="p-4 text-[11px] font-mono leading-6">
+                        <span className="text-slate-400">{':root {'}</span>{'\n'}
+                        {'  '}<span className="text-sky-300">--primary</span>{': '}<span className="text-emerald-300">262 83% 58%</span>{'; '}<span className="text-slate-600">{'/* violet */'}</span>{'\n'}
+                        {'  '}<span className="text-sky-300">--radius</span>{': '}<span className="text-emerald-300">0.5rem</span>{';'}{'\n'}
+                        {'  '}<span className="text-sky-300">--background</span>{': '}<span className="text-emerald-300">0 0% 100%</span>{';'}{'\n'}
+                        {'  '}<span className="text-sky-300">--foreground</span>{': '}<span className="text-emerald-300">222 84% 5%</span>{';'}{'\n'}
+                        <span className="text-slate-400">{'}'}</span>
+                      </pre>
+                    </div>
+                  </div>
+                )}
+                {activePage === 'darkmode' && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900">Dark Mode</h2>
+                    <p className="text-sm text-gray-600">Wrap your app with ThemeProvider to enable dark mode support:</p>
+                    <div className="rounded-xl overflow-hidden bg-[#1e1e2e] border border-white/5">
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-[#252535] border-b border-white/[0.06]">
+                        <div className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                        <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
+                        <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+                        <span className="text-[10px] text-slate-500 font-mono ml-2">layout.tsx</span>
+                      </div>
+                      <pre className="p-4 text-xs font-mono">
+                        <span className="text-violet-400">import</span>{' '}<span className="text-slate-300">{'{ ThemeProvider }'}</span>{' '}<span className="text-violet-400">from</span>{' '}<span className="text-emerald-300">"@nexaui/react"</span>{'\n\n'}
+                        <span className="text-violet-400">export default function </span><span className="text-blue-300">Layout</span><span className="text-slate-500">{'({ children }) {'}</span>{'\n'}
+                        {'  '}<span className="text-violet-400">return</span>{' (\n'}
+                        {'    <'}<span className="text-red-400">ThemeProvider</span>{'\n'}
+                        {'      '}<span className="text-sky-300">defaultTheme</span><span className="text-slate-500">=</span><span className="text-emerald-300">"system"</span>{'\n'}
+                        {'    >\n'}
+                        {'      {'}<span className="text-slate-300">children</span>{'}\n'}
+                        {'    </'}<span className="text-red-400">ThemeProvider</span>{'>\n'}
+                        {'  )\n}'}
+                      </pre>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-violet-50 rounded-xl border border-violet-100">
+                      <div className="w-8 h-8 bg-[#0f0f0f] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Moon className="w-4 h-4 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-800">System preference detected</p>
+                        <p className="text-xs text-gray-500">Respects prefers-color-scheme media query</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+            {/* Top bar */}
+            <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-gray-900">{meta.label}</h2>
+                  <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono flex-shrink-0">{meta.version}</span>
+                  {meta.isNew && <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-bold flex-shrink-0">NEW</span>}
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5 truncate">{meta.description}</p>
+              </div>
+              <button
+                onClick={() => setDarkPreview(p => !p)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 cursor-pointer transition-colors flex-shrink-0 ml-4"
+              >
+                {dp ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                {dp ? 'Light' : 'Dark'}
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex items-end px-6 border-b border-gray-100 flex-shrink-0">
+              {(['preview', 'code'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium capitalize transition-all cursor-pointer border-b-2 -mb-px ${
+                    activeTab === tab
+                      ? 'border-violet-500 text-violet-600'
+                      : 'border-transparent text-gray-400 hover:text-gray-700'
+                  }`}
+                >
+                  {tab === 'code' && <Code2 className="w-3 h-3" />}
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Content area */}
+            <div className="flex-1 overflow-y-auto">
+              <AnimatePresence mode="wait">
+                {activeTab === 'preview' ? (
+                  <motion.div
+                    key="preview"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className={`p-6 min-h-full transition-colors duration-300 ${dp ? 'bg-[#0f0f0f]' : 'bg-[#f9fafb]'}`}
+                  >
+                    <div className={`rounded-2xl border p-6 flex items-center justify-center min-h-48 transition-colors duration-300 ${dp ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
+                      {preview[activePage as UIComp]}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="code"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="p-6"
+                  >
+                    <div className="rounded-xl overflow-hidden bg-[#1e1e2e] border border-white/5">
+                      <div className="flex items-center justify-between px-4 py-2.5 bg-[#252535] border-b border-white/[0.06]">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                          <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
+                          <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+                          <span className="text-[10px] text-slate-500 font-mono ml-2">demo.tsx</span>
+                        </div>
+                        <button
+                          onClick={copyCode}
+                          className="flex items-center gap-1.5 text-[10px] font-medium cursor-pointer transition-colors px-2 py-1 rounded hover:bg-white/10"
+                        >
+                          {copyStatus === 'success' ? (
+                            <><Check className="w-3 h-3 text-emerald-400" /><span className="text-emerald-400">Copied!</span></>
+                          ) : copyStatus === 'error' ? (
+                            <><AlertCircle className="w-3 h-3 text-amber-400" /><span className="text-amber-400">Failed</span></>
+                          ) : (
+                            <><Copy className="w-3 h-3 text-slate-500" /><span className="text-slate-400">Copy</span></>
+                          )}
+                        </button>
+                      </div>
+                      <pre className="p-5 text-[10px] leading-5 overflow-x-auto font-mono whitespace-pre-wrap">
+                        {codeContent[activePage as UIComp]}
+                      </pre>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </>
+        )}
       </div>
+
+      <AnimatePresence>
+        {paletteOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 z-40"
+              onClick={() => setPaletteOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-16 left-1/2 -translate-x-1/2 w-80 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                <Search className="w-4 h-4 text-slate-500" />
+                <input
+                  autoFocus
+                  value={paletteQuery}
+                  onChange={e => { setPaletteQuery(e.target.value); setPaletteIndex(0); }}
+                  onKeyDown={e => {
+                    if (e.key === 'Escape') setPaletteOpen(false);
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setPaletteIndex(i => Math.min(i + 1, Math.max(0, paletteFiltered.length - 1)));
+                    }
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setPaletteIndex(i => Math.max(i - 1, 0));
+                    }
+                    if (e.key === 'Enter' && paletteFiltered.length > 0) {
+                      setActivePage(paletteFiltered[paletteClamped].key);
+                      setActiveTab('preview');
+                      setPaletteOpen(false);
+                    }
+                  }}
+                  placeholder="Search components..."
+                  className="flex-1 bg-transparent text-white text-sm focus:outline-none placeholder:text-slate-600"
+                />
+                <button onClick={() => setPaletteOpen(false)} className="text-slate-600 hover:text-slate-400 cursor-pointer">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="py-2 max-h-64 overflow-y-auto">
+                {paletteFiltered.length === 0 ? (
+                  <p className="px-4 py-3 text-xs text-slate-600">No results found</p>
+                ) : (
+                  paletteFiltered.map((item, i) => (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        setActivePage(item.key);
+                        setActiveTab('preview');
+                        setPaletteOpen(false);
+                      }}
+                      className={`w-full text-left flex items-center gap-3 px-4 py-2.5 transition-colors cursor-pointer ${
+                        i === paletteClamped ? 'bg-violet-500/20' : 'hover:bg-white/5'
+                      }`}
+                    >
+                      <span className={`${i === paletteClamped ? 'text-violet-400' : 'text-slate-500'}`}>{item.icon}</span>
+                      <div>
+                        <p className={`text-xs font-semibold ${i === paletteClamped ? 'text-violet-300' : 'text-slate-300'}`}>{item.label}</p>
+                        <p className="text-[10px] text-slate-600">{COMP_META[item.key].description.slice(0, 45)}...</p>
+                      </div>
+                      {COMP_META[item.key].isNew && <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-400 px-1 py-0.5 rounded font-bold">NEW</span>}
+                    </button>
+                  ))
+                )}
+              </div>
+              <div className="px-4 py-2 border-t border-white/[0.06] flex items-center gap-3 text-[9px] text-slate-700">
+                <span>↑↓ navigate</span>
+                <span>↵ select</span>
+                <span>esc close</span>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

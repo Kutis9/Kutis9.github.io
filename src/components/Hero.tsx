@@ -171,6 +171,7 @@ export function Hero() {
                 size="sm" 
                 className="rounded-full w-10 h-10 p-0 cursor-pointer"
                 onClick={() => window.open(personalInfo.links.github, '_blank')}
+                aria-label="GitHub Profile"
               >
                 <Github size={18} />
               </Button>
@@ -179,6 +180,7 @@ export function Hero() {
                 size="sm" 
                 className="rounded-full w-10 h-10 p-0 cursor-pointer"
                 onClick={() => window.open(personalInfo.links.linkedin, '_blank')}
+                aria-label="LinkedIn Profile"
               >
                 <Linkedin size={18} />
               </Button>
@@ -187,6 +189,7 @@ export function Hero() {
                 size="sm" 
                 className="rounded-full w-10 h-10 p-0 cursor-pointer"
                 onClick={() => window.open(`mailto:${personalInfo.email}`, '_self')}
+                aria-label="Send Email"
               >
                 <Mail size={18} />
               </Button>

@@ -105,6 +105,7 @@ export function Navigation() {
             size="sm"
             className="md:hidden p-2 cursor-pointer"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
